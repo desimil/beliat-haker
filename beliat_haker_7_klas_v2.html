@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Белият хакер | Кибермисия 7. клас</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#06111d;color:#edf7ff}
+.app{max-width:1150px;margin:auto;padding:22px}
+header{padding:24px;border-radius:22px;background:linear-gradient(135deg,#0b2034,#123b50);border:1px solid #24516a;display:flex;gap:18px;align-items:center}
+.logo{font-size:58px}
+h1{margin:0;font-size:34px}
+header p{margin:7px 0 0;color:#a9c5d9}
+.layout{display:grid;grid-template-columns:270px 1fr;gap:18px;margin-top:18px}
+.card{background:#0b1b2b;border:1px solid #1c3a51;border-radius:18px;padding:18px}
+.menu h2{margin-top:0}
+button{font-family:inherit}
+.topic,.mission{width:100%;text-align:left;padding:12px;margin:5px 0;border-radius:11px;border:1px solid #24465d;background:#10283d;color:#eef8ff;cursor:pointer}
+.topic:hover,.mission:hover{background:#173b55}
+.mission{font-size:14px}
+.chat{min-height:690px;display:flex;flex-direction:column}
+.messages{flex:1;overflow:auto;padding:4px}
+.msg{max-width:86%;padding:14px 16px;margin:10px 0;border-radius:16px;line-height:1.48}
+.bot{background:#102a40;border-bottom-left-radius:4px}
+.user{background:#176b63;margin-left:auto;border-bottom-right-radius:4px}
+.badge{display:inline-block;background:#1a5067;padding:4px 8px;border-radius:20px;font-size:11px;margin-bottom:7px}
+.input{display:flex;gap:9px;margin-top:12px}
+input{flex:1;padding:14px;border-radius:12px;border:1px solid #294b63;background:#06111d;color:white;font-size:16px}
+.send{padding:0 21px;border:0;border-radius:12px;background:#36d39a;color:#052219;font-weight:bold;cursor:pointer}
+.send:hover{background:#58e2ad}
+.tip{margin-top:11px;color:#8faabd;font-size:13px}
+.score{margin-top:15px;padding:13px;border-radius:12px;background:#0d2637;color:#bfe6ff}
+.challenge{border:1px solid #35627a;background:#0b2636;border-radius:13px;padding:14px;margin-top:10px}
+.choice{display:block;width:100%;padding:10px;margin-top:7px;text-align:left;border:1px solid #31576d;background:#102d41;color:white;border-radius:9px;cursor:pointer}
+.choice:hover{background:#18445c}
+.good{background:#174b3a!important;border-color:#36d39a!important}
+.bad{background:#512d31!important;border-color:#e27676!important}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.menu{order:2}.chat{min-height:650px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div class="logo">🧑‍💻</div>
+<div>
+<h1>БЕЛИЯТ ХАКЕР</h1>
+<p>Киберсигурност за 7. клас · Влез в мисията. Разследвай. Мисли като хакер. Защитавай като професионалист.</p>
+</div>
+</header>
+
+<div class="layout">
+<aside class="card menu">
+<h2>🎯 Разследвай</h2>
+<button class="topic" onclick="ask('Как работи един компютърен вирус?')">🦠 Вируси</button>
+<button class="topic" onclick="ask('Как работи фишинг атаката?')">🎣 Фишинг</button>
+<button class="topic" onclick="ask('Какво прави ransomware?')">🔒 Ransomware</button>
+<button class="topic" onclick="ask('Какво е троянски кон?')">🐴 Троянски кон</button>
+<button class="topic" onclick="ask('Как хакерите разбират, че една система е уязвима?')">🔎 Уязвимости</button>
+<button class="topic" onclick="ask('Как се защитава Wi-Fi мрежа?')">📡 Wi‑Fi</button>
+<button class="topic" onclick="ask('Какво е социално инженерство?')">🧠 Социално инженерство</button>
+<button class="topic" onclick="ask('Какво е силна парола и защо?')">🔑 Пароли</button>
+
+<h2 style="margin-top:22px">⚡ Бърза мисия</h2>
+<button class="mission" onclick="challenge()">🎯 Ситуация: получаваш странен линк</button>
+
+<div class="score">⭐ Точки: <b id="score">0</b></div>
+</aside>
+
+<main class="card chat">
+<div class="messages" id="messages">
+<div class="msg bot">
+<span class="badge">🧑‍💻 БЯЛ ХАКЕР</span><br>
+Добре дошъл в моята киберлаборатория! 😎<br><br>
+Тук няма скучни определения. Можеш да питаш <b>как работят атаките, защо са опасни, как мисли нападателят и как защитникът го спира</b>.<br><br>
+Мога да обсъждам и реални техники <b>на концептуално и защитно ниво</b>. Само няма да давам инструкции за нападение срещу реални хора или системи.<br><br>
+Готов ли си? Питай смело.
+</div>
+</div>
+
+<div class="input">
+<input id="q" placeholder="Например: „Как хакерът може да подмами човек?“" onkeydown="if(event.key==='Enter')send()">
+<button class="send" onclick="send()">ПИТАЙ</button>
+</div>
+<div class="tip">💡 Колкото по-конкретен е въпросът, толкова по-интересен ще е отговорът.</div>
+</main>
+</div>
+</div>
+
+<script>
+let points=0;
+const answers=[
+[/вирус|malware|зловред/i,`🦠 <b>Вирусът не е магия.</b> Това е програма, която използва определено поведение, за да се разпространява или да извършва нежелани действия.<br><br>Интересната част е <b>веригата на атаката</b>: заразяване → изпълнение → действие → евентуално разпространение. Защитата се опитва да прекъсне тази верига.`],
+[/фишинг|phishing/i,`🎣 Фишингът разчита повече на <b>човешката реакция</b>, отколкото на „магически хак“. Нападателят може да използва спешност, страх, любопитство или авторитет, за да те накара да действаш.<br><br>Ключов въпрос: <b>„Защо този човек иска да направя това точно сега?“</b>`],
+[/ransomware|рансъмуер/i,`🔒 При ransomware целта често е данните да станат недостъпни. Затова резервните копия са толкова важни.<br><br>Представи си атаката като верига: достъп → изпълнение → криптиране/блокиране → изнудване. Защитникът търси места, където може да прекъсне веригата.`],
+[/троян/i,`🐴 Троянският кон използва измама: нещо изглежда полезно, но има скрита нежелана функция.<br><br>Това е добър пример защо <b>„Изглежда нормално“ не означава „Безопасно е“.</b>`],
+[/уязвим|уязвимост/i,`🔎 <b>Уязвимост</b> е слабост в система, приложение или настройка, която може да бъде използвана по нежелан начин.<br><br>Белият хакер търси такива слабости <b>с разрешение</b>, за да бъдат поправени. Това е разликата между тест за сигурност и атака.`],
+[/wifi|wi-fi|безжич/i,`📡 Защитеният Wi‑Fi започва с добра парола за мрежата, актуален рутер и правилно настроена защита.<br><br>Не използвай фабрични пароли и не оставяй управлението на рутера достъпно с лесна парола.`],
+[/социално инженерство|манипули|подмам/i,`🧠 Социалното инженерство атакува <b>човешкото решение</b>, а не непременно самия компютър.<br><br>Нападателят може да се представи за учител, приятел, служител или известна организация. Най-силната защита е да провериш самоличността по независим начин.`],
+[/парол/i,`🔑 Силната парола е дълга, уникална и не е свързана лесно с теб. За различни услуги използвай различни пароли, а за важните акаунти включи 2FA.<br><br><b>Никога не ми изпращай истинска парола.</b>`],
+[/как.*хакер|как.*атак|как.*напад/i,`🧑‍💻 Хакерът не е задължително „зъл“. В киберсигурността има нападатели, защитници и специалисти, които тестват системи с разрешение.<br><br>Мога да ти обясня <b>какво търси нападателят, какви следи оставя и как защитникът го открива</b>. Няма да давам инструкции за атака на реална система.`],
+[/закон|незакон|разреш/i,`⚖️ Най-простото правило: <b>не тествай чужда система без разрешение.</b><br><br>За практика използвай собствен компютър, учебна лаборатория или платформа, която изрично позволява тестове.`]
+];
+
+function add(text,type){let d=document.createElement('div');d.className='msg '+type;d.innerHTML=text;document.getElementById('messages').appendChild(d);d.scrollIntoView({behavior:'smooth'});}
+function ask(q){document.getElementById('q').value=q;send();}
+function send(){
+ let el=document.getElementById('q'),q=el.value.trim();if(!q)return;
+ add(esc(q),'user');el.value='';
+ let a=`🧠 Интересен въпрос. Мога да го разгледам като разследване: <b>какво се случва → защо работи → каква следа оставя → как се спира.</b>`;
+ for(let [r,t] of answers)if(r.test(q)){a=t;break;}
+ if(/как.*зараз.*чуж|как.*открад.*парол|как.*влез.*чужд|как.*избег.*открив|как.*скрия.*след|как.*заобикол.*защит/i.test(q))
+ a=`🛑 Тук ще сменя посоката: няма да давам стъпки за реална атака или прикриване.<br><br>Но можем да разгледаме <b>същата техника от страната на защитника</b>: каква е целта, какви признаци оставя атаката и как се предотвратява.`;
+ setTimeout(()=>add(a,'bot'),220);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function challenge(){
+ let m=document.getElementById('messages');
+ let d=document.createElement('div');d.className='msg bot';
+ d.innerHTML=`<span class="badge">⚡ КИБЕРМИСИЯ</span><br><b>Получаваш съобщение:</b><br><br>„Спешно! Печелиш безплатен телефон. Натисни този линк до 5 минути, иначе наградата изчезва!“<div class="challenge"><b>Какво правиш?</b><button class="choice" onclick="answerChoice(this,false)">A. Натискам веднага.</button><button class="choice" onclick="answerChoice(this,true)">B. Проверявам подателя и адреса на линка.</button><button class="choice" onclick="answerChoice(this,false)">C. Препращам го на приятел.</button></div>`;
+ m.appendChild(d);d.scrollIntoView({behavior:'smooth'});
+}
+function answerChoice(btn,good){
+ if(btn.parentElement.dataset.done)return;
+ btn.parentElement.dataset.done='1';
+ if(good){btn.classList.add('good');points+=10;document.getElementById('score').textContent=points;add('🎉 <b>+10 точки!</b> Точно така. Първо проверяваме, после действаме.','bot');}
+ else{btn.classList.add('bad');add('🔍 Почти! Помисли какво се опитва да предизвика съобщението — спешност и любопитство.','bot');}
+}
+</script>
+</body>
+</html>
